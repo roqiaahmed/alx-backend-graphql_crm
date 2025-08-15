@@ -25,5 +25,5 @@ class Order(models.Model):
     status = models.CharField(max_length=15, default="INPROGRESS", choices=STATUS)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, related_name="orders")
-    totalAmount = models.FloatField()
+    total_amount = models.FloatField()
     order_date = models.DateTimeField(auto_now=True)

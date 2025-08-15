@@ -92,47 +92,57 @@ class BulkCreateCustomers(graphene.Mutation):
         return BulkCreateCustomers(customers=valid_customers, errors=errors)
 
 
+class ProductInput(graphene.InputObjectType):
+    name = graphene.String(required=True)
+    price = graphene.Float(required=True)
+    stock = graphene.Int(default_value=0)
+
+
 class CreateProduct(graphene.Mutation):
     class Arguments:
-        name = graphene.String(required=True)
-        price = graphene.Decimal(required=True)
-        stock = graphene.Int(default_value=0)
+        input = ProductInput(required=True)
 
     product = graphene.Field(ProductType)
 
     @classmethod
-    def mutate(self, info, name, price, stock):
-        if price <= 0:
+    def mutate(cls, root, info, input):
+        if input.price <= 0:
             raise GraphQLError("Price must be positive.")
-        if stock < 0:
+        if input.stock < 0:
             raise GraphQLError("Stock cannot be negative.")
 
-        product = Product.objects.create(name=name, price=price, stock=stock)
+        product = Product.objects.create(
+            name=input.name, price=input.price, stock=input.stock
+        )
         return CreateProduct(product=product)
+
+
+class OrderInput(graphene.InputObjectType):
+    customer_id = graphene.ID(required=True)
+    product_ids = graphene.List(graphene.ID, required=True)
+    order_date = graphene.DateTime(required=False)
 
 
 class CreateOrder(graphene.Mutation):
     class Arguments:
-        customer_id = graphene.ID(required=True)
-        product_ids = graphene.List(graphene.ID, required=True)
-        order_date = graphene.DateTime(required=False)
+        input = OrderInput(required=True)
 
     order = graphene.Field(OrderType)
 
     @classmethod
-    def mutate(self, info, customer_id, product_ids, order_date):
+    def mutate(cls, root, info, input):
         try:
-            customer = Customer.objects.get(pk=customer_id)
+            customer = Customer.objects.get(pk=input.customer_id)
         except Customer.DoesNotExist:
             raise GraphQLError("Invalid customer ID.")
 
-        if not product_ids:
+        if not input.product_ids:
             raise GraphQLError("At least one product must be selected.")
 
         products = []
         total_amount = 0
 
-        for pid in product_ids:
+        for pid in input.product_ids:
             try:
                 product = Product.objects.get(pk=pid)
                 products.append(product)
@@ -140,8 +150,7 @@ class CreateOrder(graphene.Mutation):
             except Product.DoesNotExist:
                 raise GraphQLError(f"Invalid product ID: {pid}")
 
-        if order_date is None:
-            order_date = datetime.now()
+        order_date = datetime.now()
 
         order = Order.objects.create(
             customer=customer, order_date=order_date, total_amount=total_amount
