@@ -5,6 +5,7 @@ class Customer(models.Model):
     name = models.CharField(max_length=30)
     email = models.EmailField(unique=True, null=False)
     phone = models.CharField(max_length=15, null=True)
+    created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name

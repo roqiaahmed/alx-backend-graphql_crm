@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "graphene_django",
     "crm",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
