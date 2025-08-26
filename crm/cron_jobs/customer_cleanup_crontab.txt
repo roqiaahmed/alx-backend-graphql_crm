@@ -1,0 +1,1 @@
+0 2 * * 0 /Users/roqia/Desktop/ALX_Pro/alx-backend-python/alx-backend-graphql_crm/crm/cron_jobs/clean_inactive_customers.sh >> /var/log/django_cleanup.log 2>&1
