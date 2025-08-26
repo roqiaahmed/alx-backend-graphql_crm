@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "graphene_django",
     "crm",
     "django_filters",
+    "django_crontab",
 ]
 
 MIDDLEWARE = [
@@ -124,6 +125,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+CRONJOBS = [
+    ("*/5 * * * *", "crm.cron.log_crm_heartbeat"),
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
