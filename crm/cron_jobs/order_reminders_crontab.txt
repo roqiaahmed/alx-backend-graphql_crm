@@ -1,0 +1,1 @@
+0 8 * * * /Users/roqia/Desktop/ALX_Pro/alx-backend-python/alx-backend-graphql_crm/crm/cron_jobs/send_order_reminders.py >> /var/log/django_cleanup.log 2>&1
