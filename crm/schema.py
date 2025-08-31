@@ -1,7 +1,7 @@
 from datetime import datetime
 import graphene
 from graphene_django.filter import DjangoFilterConnectionField
-
+from crm.models import Product
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 from .models import Customer, Product, Order
@@ -126,6 +126,24 @@ class CreateProduct(graphene.Mutation):
         return CreateProduct(product=product)
 
 
+class UpdateLowStockProducts(graphene.Mutation):
+
+    products = graphene.List(ProductType)
+    message = graphene.String()
+
+    @classmethod
+    def mutate(cls, root, info):
+        products = []
+        filter_products = list(Product.objects.filter(stock__lt=10))
+        for product in filter_products:
+            product.stock += 10
+            product.save()
+            products.append(product)
+        return UpdateLowStockProducts(
+            products=products, message="products updated successfully."
+        )
+
+
 class OrderInput(graphene.InputObjectType):
     customer_id = graphene.ID(required=True)
     product_ids = graphene.List(graphene.ID, required=True)
@@ -174,6 +192,7 @@ class Mutation(graphene.ObjectType):
     bulk_create_customers = BulkCreateCustomers.Field()
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field()
+    update_low_stock_products = UpdateLowStockProducts.Field()
 
 
 class Query(graphene.ObjectType):

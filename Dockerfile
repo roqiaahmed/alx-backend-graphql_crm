@@ -1,6 +1,6 @@
 FROM python:3.10
 
-RUN apt-get update && apt-get install -y default-libmysqlclient-dev gcc
+RUN apt-get update && apt-get install -y cron && apt-get install -y default-libmysqlclient-dev gcc
 
 RUN mkdir /app
 
